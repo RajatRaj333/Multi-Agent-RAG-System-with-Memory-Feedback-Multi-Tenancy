@@ -10,17 +10,15 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-# 1. Embeddings Initialize (Local/Free) - Yeh same rahega
 embeddings_model = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
 
-# 2. Answer Agent ke liye Groq LLM Initialize karna
 llm = ChatGroq(
     temperature=0.3, 
-    model_name="llama-3.1-8b-instant", # Purane model ki jagah yeh naya aur supported model use karein
+    model_name="llama-3.1-8b-instant", 
     api_key=os.getenv("GROQ_API_KEY")
 )
 
-# 3. Retriever Agent (Bilkuk same rahega, isme koi change nahi)
+
 async def retriever_agent(user_id: str, question: str):
     query_vector = embeddings_model.embed_query(question)
     
@@ -42,8 +40,7 @@ async def retriever_agent(user_id: str, question: str):
     combined_context = "\n\n".join([doc['content'] for doc in contexts])
     return combined_context
 
-# 4. Updated Answer Agent (Groq ke sath)
-# Updated Answer Agent with Memory
+
 async def answer_agent(context: str, question: str, history: list):
     if not context and not history:
         return "Fallback Response: I'm sorry, but I couldn't find any relevant information."
@@ -69,19 +66,18 @@ async def answer_agent(context: str, question: str, history: list):
         logger.error(f"LLM API Error: {str(e)}")
         return f"Fallback Response: AI Model error - {str(e)}"
 
-# Updated Main Coordinator
 async def process_user_query(user_id: str, question: str):
     try:
-        # 1. Pichli conversations fetch karein (Memory)
+        
         history = get_recent_history(user_id, limit=3)
         
-        # 2. Naya context retrieve karein
+        
         context = await retriever_agent(user_id, question)
         
-        # 3. LLM se answer generate karein (History + Context pass karke)
+        
         final_answer = await answer_agent(context, question, history)
         
-        # 4. Is nayi conversation ko database mein save karein
+        
         save_conversation(user_id, question, final_answer, context if context else "None")
         
         return {
@@ -95,7 +91,6 @@ async def process_user_query(user_id: str, question: str):
       
 import json
 
-# --- Helper Functions for Memory ---
 
 def save_conversation(user_id: str, question: str, answer: str, context_used: str):
     """Saves the current question, answer, and context to the database."""
@@ -122,7 +117,7 @@ def get_recent_history(user_id: str, limit: int = 3):
             .limit(limit)\
             .execute()
         
-        # Puraani chats ko pehle rakhne ke liye list ko reverse kar rahe hain
+        
         history = response.data[::-1]
         return history
     except Exception as e:

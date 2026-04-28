@@ -19,7 +19,7 @@ async def upload_document(
     user_id: str = Form(..., description="Unique ID of the user"),
     file: UploadFile = File(..., description="Text file to upload")
 ):
-    # ... (Aapka purana upload code yahan rahega, usme koi change nahi hai) ...
+    
     if not file.filename.endswith(".txt"):
         raise HTTPException(status_code=400, detail="Currently only .txt files are supported.")
     try:
@@ -32,7 +32,6 @@ async def upload_document(
 
 
 
-# NAYA ENDPOINT: Ask Question
 @router.post("/ask")
 async def ask_question(request: AskRequest):
     """

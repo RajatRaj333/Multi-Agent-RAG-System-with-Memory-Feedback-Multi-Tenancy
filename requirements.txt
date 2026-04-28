@@ -1,7 +1,12 @@
+
 fastapi
 uvicorn
 supabase
 pydantic
 langchain
-langchain-openai
+langchain-huggingface
+langchain-groq
+sentence-transformers
+python-multipart
 python-dotenv
+langchain-openai
