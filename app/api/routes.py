@@ -2,6 +2,7 @@ from fastapi import APIRouter, UploadFile, File, Form, HTTPException
 from pydantic import BaseModel
 from app.services.rag_pipeline import process_and_store_document
 from app.agents.multi_agent import process_user_query
+from fastapi import APIRouter, HTTPException
 
 router = APIRouter()
 
@@ -9,6 +10,9 @@ router = APIRouter()
 class AskRequest(BaseModel):
     user_id: str
     question: str
+
+
+
 
 @router.post("/upload")
 async def upload_document(
@@ -26,6 +30,8 @@ async def upload_document(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
+
 # NAYA ENDPOINT: Ask Question
 @router.post("/ask")
 async def ask_question(request: AskRequest):
@@ -38,3 +44,6 @@ async def ask_question(request: AskRequest):
         return response
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+      
+
+
